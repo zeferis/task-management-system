@@ -10,3 +10,13 @@ export const getTasks =async (req:Request,res:Response)=>{
         console.error("Get tasks error:",error);
     }
 };
+export const createTask= async(req:Request,res:Response)=>{
+    try{
+        const {title,description} =req.body;
+        const result=await pool.query("INSERT INTO tasks(title,description) VALUES ($1,$2) RETURNING *",[title, description]);
+        res.status(201).json(result.rows[0]);
+    }catch(error){
+        console.error("Create tasks error:",error);
+        res.status(500).json({message:'Server error'});
+    }
+}

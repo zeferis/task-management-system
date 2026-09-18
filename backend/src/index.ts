@@ -1,6 +1,5 @@
 import express from 'express';
 import 'dotenv/config';
-import pool from './config/db.js';
 import router from './routes/taskRoutes.js'; 
 
 const app=express();
