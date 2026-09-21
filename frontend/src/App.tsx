@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { getTasks,createTask } from "./services/taskServices";
+import {
+  getTasks,
+  createTask,
+  deleteTask,
+  updateTask,
+} from "./services/taskServices";
 interface Task {
   id: number;
   title: string;
@@ -10,12 +15,49 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [titles, setTitles] = useState("");
   const [description, setDescription] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTask = await createTask(titles, description);
     setTasks((prev) => [newTask, ...prev]);
     setTitles("");
     setDescription("");
+  };
+  const handleDelete = async (id: number) => {
+    await deleteTask(id);
+    setTasks((prev) => prev.filter((e) => e.id !== id));
+  };
+  const handleComplete = async (task: Task) => {
+    const updatedTask = await updateTask(
+      task.id,
+      task.title,
+      task.description,
+      "complete",
+    );
+
+    setTasks((prev) =>
+      prev.map((item) => (item.id === task.id ? updatedTask : item)),
+    );
+  };
+  const handleUpdate = async (task: Task) => {
+    const updatedTask = await updateTask(
+      task.id,
+      editTitle,
+      editDescription,
+      task.status,
+    );
+
+    setTasks((prev) =>
+      prev.map((item) => (item.id === task.id ? updatedTask : item)),
+    );
+    setEditingId(null);
+  };
+  const handleEdit = (task: Task) => {
+    setEditingId(task.id);
+    setEditTitle(task.title);
+    setEditDescription(task.description);
   };
   useEffect(() => {
     const fetchTasks = async () => {
@@ -44,9 +86,30 @@ function App() {
       <h1>Task Management</h1>
       {tasks.map((task) => (
         <div key={task.id}>
-          <h2>{task.title}</h2>
-          <p>{task.description}</p>
-          <p>{task.status}</p>
+          {editingId === task.id ? (
+            <>
+              <input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+
+              <input
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+              />
+
+              <button onClick={() => handleUpdate(task)}>Save</button>
+            </>
+          ) : (
+            <div>
+              <h2>{task.title}</h2>
+              <p>{task.description}</p>
+              <p>{task.status}</p>
+              <button onClick={() => handleDelete(task.id)}>DELETE</button>
+              <button onClick={() => handleComplete(task)}>COMPLETE</button>
+              <button onClick={() => handleEdit(task)}>EDIT</button>
+            </div>
+          )}
         </div>
       ))}
     </div>

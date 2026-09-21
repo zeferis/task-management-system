@@ -11,3 +11,11 @@ export const createTask = async (title: string, description: string) => {
   });
   return response.data;
 };
+export const deleteTask = async (id: number) => {
+  const response = await axios.delete(`${API_URL}/${id}`);
+  return response.data;
+};
+export const updateTask= async(id:number,title:string,description:string,status:string)=>{
+  const response=await axios.put(`${API_URL}/${id}`,{title,description,status});
+  return response.data;
+}
