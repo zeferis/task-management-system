@@ -5,6 +5,7 @@ import {
   deleteTask,
   updateTask,
 } from "./services/taskServices";
+import TaskItem from "./components/TaskItem";
 interface Task {
   id: number;
   title: string;
@@ -18,6 +19,7 @@ function App() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [filter, setFilter] = useState("all");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTask = await createTask(titles, description);
@@ -59,6 +61,10 @@ function App() {
     setEditTitle(task.title);
     setEditDescription(task.description);
   };
+  const filterTasks=tasks.filter((task)=>{
+    if(filter==='all'||task.status===filter)return true;
+    return false;
+  })
   useEffect(() => {
     const fetchTasks = async () => {
       const data = await getTasks();
@@ -84,7 +90,10 @@ function App() {
         <button type="submit">Add Task</button>
       </form>
       <h1>Task Management</h1>
-      {tasks.map((task) => (
+      <button onClick={() => setFilter("active")}>ACTIVE</button>
+      <button onClick={() => setFilter("complete")}>COMPLETE</button>
+      <button onClick={() => setFilter("all")}>ALL</button>
+      {filterTasks.map((task) => (
         <div key={task.id}>
           {editingId === task.id ? (
             <>
@@ -101,14 +110,13 @@ function App() {
               <button onClick={() => handleUpdate(task)}>Save</button>
             </>
           ) : (
-            <div>
-              <h2>{task.title}</h2>
-              <p>{task.description}</p>
-              <p>{task.status}</p>
-              <button onClick={() => handleDelete(task.id)}>DELETE</button>
-              <button onClick={() => handleComplete(task)}>COMPLETE</button>
-              <button onClick={() => handleEdit(task)}>EDIT</button>
-            </div>
+            <TaskItem
+              key={task.id}
+              task={task}
+              onDelete={handleDelete}
+              onComplete={handleComplete}
+              onEdit={handleEdit}
+            />
           )}
         </div>
       ))}
