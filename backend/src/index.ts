@@ -12,8 +12,8 @@ const port = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api/tasks",router);
 app.use("/api/auth",authRouter);
+app.use("/api/tasks",router);
 app.use(notFound);
 app.use(errorHandler);
 app.listen(port, () => {
