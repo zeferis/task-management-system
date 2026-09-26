@@ -1,10 +1,8 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
+import type { AuthRequest } from "../types/auth.js";
 import jwt from "jsonwebtoken";
 interface JwtPayload {
   userId: number;
-}
-interface AuthRequest extends Request {
-  userId?: number;
 }
 export const authenticate = (
   req: AuthRequest,
@@ -24,10 +22,17 @@ export const authenticate = (
       message: "Invalid token format",
     });
   }
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET as string,
-  ) as JwtPayload;
-  req.userId = decoded.userId;
-  next();
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string,
+    ) as JwtPayload;
+
+    req.userId = decoded.userId;
+    next();
+  } catch {
+    return res.status(401).json({
+      message: "Invalid or expired token",
+    });
+  }
 };
