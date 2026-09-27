@@ -3,7 +3,7 @@ import type { Response } from "express";
 import type { AuthRequest } from "../types/auth.js";
 export const getTasks = async (req: AuthRequest, res: Response) => {
   const result = await pool.query(
-    "SELECT * FROM tasks WHERE user_id=$1 ORDER BY created_at DESC",
+    "SELECT * FROM tasks WHERE user_id=$1 ORDER BY create_at DESC",
     [req.userId],
   );
   res.status(200).json(result.rows);
@@ -17,7 +17,7 @@ export const createTask = async (req: AuthRequest, res: Response) => {
   }
   if (typeof description !== "string") {
     return res.status(400).json({
-      message: "description must be a non-empty string",
+      message: "description must be string",
     });
   }
   const result = await pool.query(

@@ -10,7 +10,7 @@ interface TaskItemProps {
   onComplete: (task: Task) => void;
   onEdit: (task: Task) => void;
 }
-const TaskItem = ({ task, onDelete, onComplete,onEdit }: TaskItemProps) => (
+const TaskItem = ({ task, onDelete, onComplete, onEdit }: TaskItemProps) => (
   <div>
     <h2>{task.title}</h2>
     <p>{task.description}</p>
