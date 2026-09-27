@@ -12,7 +12,10 @@ interface Task {
   description: string;
   status: string;
 }
-const Tasks = () => {
+interface logoutProps {
+  onLogout: () => void;
+}
+const Tasks = ({ onLogout }: logoutProps) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [titles, setTitles] = useState("");
   const [description, setDescription] = useState("");
@@ -74,6 +77,7 @@ const Tasks = () => {
   }, []);
   return (
     <div>
+      <button onClick={() => onLogout()}>Logout</button>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
