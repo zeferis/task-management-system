@@ -1,28 +1,44 @@
 import { useState } from "react";
 import { login } from "../services/authServices";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 interface LoginProps {
   onLogin: (token: string) => void;
 }
 const Login = ({ onLogin }: LoginProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [loading,setLoading]=useState(false);
   const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = await login(email, password);
-    localStorage.setItem("token", data.token);
-    setEmail("");
-    setPassword("");
-    onLogin(data.token);
-    navigate("/");
+    setErr("");
+    setLoading(true);
+    try {
+      const data = await login(email, password);
+      localStorage.setItem("token", data.token);
+      setEmail("");
+      setPassword("");
+      onLogin(data.token);
+      navigate("/");
+    } catch (error) {
+      if(axios.isAxiosError(error)){
+        setErr(error.response?.data?.message||"Cannot login");
+      }
+      else{
+        setErr("Cannot login");
+      }
+    }finally{
+      setLoading(false);
+    }
   };
   return (
     <form onSubmit={handleSubmit}>
       <label htmlFor="email">Email:</label>
       <input
         id="email"
-        type="text"
+        type="email"
         placeholder="email"
         value={email}
         onChange={(e) => {
@@ -39,7 +55,8 @@ const Login = ({ onLogin }: LoginProps) => {
           setPassword(e.target.value);
         }}
       />
-      <button type="submit">Login</button>
+      <button type="submit" disabled={loading}>{loading?"logining":"login"}</button>
+      {err&&(<p>{err}</p>)}
     </form>
   );
 };

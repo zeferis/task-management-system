@@ -3,7 +3,7 @@ import type { Response } from "express";
 import type { AuthRequest } from "../types/auth.js";
 export const getTasks = async (req: AuthRequest, res: Response) => {
   const result = await pool.query(
-    "SELECT * FROM tasks WHERE user_id=$1 ORDER BY create_at DESC",
+    "SELECT * FROM tasks WHERE user_id=$1 ORDER BY created_at DESC",
     [req.userId],
   );
   res.status(200).json(result.rows);

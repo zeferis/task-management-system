@@ -1,9 +1,4 @@
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-}
+import type { Task } from "../types/task";
 interface TaskItemProps {
   task: Task;
   onDelete: (id: number) => void;

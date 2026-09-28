@@ -1,4 +1,5 @@
 import axios from "axios";
+import type {TaskStatus} from "../types/task";
 const API_URL = "http://localhost:3000/api/tasks";
 const getConfig = () => {
   const token = localStorage.getItem("token");
@@ -35,7 +36,7 @@ export const updateTask = async (
   id: number,
   title: string,
   description: string,
-  status: string,
+  status: TaskStatus,
 ) => {
   const response = await axios.put(
     `${API_URL}/${id}`,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   getTasks,
   createTask,
@@ -6,12 +6,8 @@ import {
   updateTask,
 } from "../services/taskServices";
 import TaskItem from "../components/TaskItem";
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-}
+import axios from "axios";
+import type { Task } from "../types/task";
 interface logoutProps {
   onLogout: () => void;
 }
@@ -23,41 +19,76 @@ const Tasks = ({ onLogout }: logoutProps) => {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [filter, setFilter] = useState("all");
+  const [err, setErr] = useState("");
+  const handleError = useCallback(
+    (error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          onLogout();
+          return;
+        }
+        setErr(error.response?.data?.message || "Something went wrong");
+        return;
+      }
+      setErr("Something went wrong");
+    },
+    [onLogout],
+  );
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newTask = await createTask(titles, description);
-    setTasks((prev) => [newTask, ...prev]);
-    setTitles("");
-    setDescription("");
+    setErr("");
+    try {
+      const newTask = await createTask(titles, description);
+      setTasks((prev) => [newTask, ...prev]);
+      setTitles("");
+      setDescription("");
+    } catch (error) {
+      handleError(error);
+    }
   };
   const handleDelete = async (id: number) => {
-    await deleteTask(id);
-    setTasks((prev) => prev.filter((e) => e.id !== id));
+    setErr("");
+    try {
+      await deleteTask(id);
+      setTasks((prev) => prev.filter((e) => e.id !== id));
+    } catch (error) {
+      handleError(error);
+    }
   };
   const handleComplete = async (task: Task) => {
-    const updatedTask = await updateTask(
-      task.id,
-      task.title,
-      task.description,
-      "complete",
-    );
+    setErr("");
+    try {
+      const updatedTask = await updateTask(
+        task.id,
+        task.title,
+        task.description,
+        "complete",
+      );
 
-    setTasks((prev) =>
-      prev.map((item) => (item.id === task.id ? updatedTask : item)),
-    );
+      setTasks((prev) =>
+        prev.map((item) => (item.id === task.id ? updatedTask : item)),
+      );
+    } catch (error) {
+      handleError(error);
+    }
   };
   const handleUpdate = async (task: Task) => {
-    const updatedTask = await updateTask(
-      task.id,
-      editTitle,
-      editDescription,
-      task.status,
-    );
+    setErr("");
+    try {
+      const updatedTask = await updateTask(
+        task.id,
+        editTitle,
+        editDescription,
+        task.status,
+      );
 
-    setTasks((prev) =>
-      prev.map((item) => (item.id === task.id ? updatedTask : item)),
-    );
-    setEditingId(null);
+      setTasks((prev) =>
+        prev.map((item) => (item.id === task.id ? updatedTask : item)),
+      );
+      setEditingId(null);
+    } catch (error) {
+      handleError(error);
+    }
   };
   const handleEdit = (task: Task) => {
     setEditingId(task.id);
@@ -70,11 +101,15 @@ const Tasks = ({ onLogout }: logoutProps) => {
   });
   useEffect(() => {
     const fetchTasks = async () => {
-      const data = await getTasks();
-      setTasks(data);
+      try {
+        const data = await getTasks();
+        setTasks(data);
+      } catch (error) {
+        handleError(error);
+      }
     };
     fetchTasks();
-  }, []);
+  }, [handleError]);
   return (
     <div>
       <button onClick={() => onLogout()}>Logout</button>
@@ -123,6 +158,7 @@ const Tasks = ({ onLogout }: logoutProps) => {
           )}
         </div>
       ))}
+      {err && <p>{err}</p>}
     </div>
   );
 };
