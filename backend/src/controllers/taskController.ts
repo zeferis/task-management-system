@@ -22,7 +22,7 @@ export const createTask = async (req: AuthRequest, res: Response) => {
   }
   const result = await pool.query(
     "INSERT INTO tasks(title,description,user_id) VALUES ($1,$2,$3) RETURNING *",
-    [title, description, req.userId],
+    [title.trim(), description, req.userId],
   );
   res.status(201).json(result.rows[0]);
 };
@@ -31,11 +31,18 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
   const { title, description, status } = req.body;
   if (typeof title !== "string" || title.trim() === "") {
     return res.status(400).json({
-      message: "Title must be a non-empty string",
+      message: "Title invalid",
     });
   }
-  if (!["active", "complete"].includes(status)) {
-    return res.status(400).json({ message: "invalid status" });
+  if (typeof description !== "string") {
+    return res.status(400).json({
+      message: "description must be string",
+    });
+  }
+  if (typeof status !== "string" || !["active", "complete"].includes(status)) {
+    return res.status(400).json({
+      message: "Status must be active or complete",
+    });
   }
   const taskId = Number(id);
 
@@ -46,7 +53,7 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
   }
   const result = await pool.query(
     "UPDATE tasks SET title=$1, description=$2, status=$3 WHERE id=$4 AND user_id=$5 RETURNING *",
-    [title, description, status, taskId, req.userId],
+    [title.trim(), description, status, taskId, req.userId],
   );
   if (!result.rows[0]) {
     res.status(404).json({ message: "cant find task" });

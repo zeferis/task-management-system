@@ -1,6 +1,7 @@
 import axios from "axios";
-import type {TaskStatus} from "../types/task";
-const API_URL = "http://localhost:3000/api/tasks";
+import type { TaskStatus } from "../types/task";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const TASKS_URL = `${API_URL}/api/tasks`;
 const getConfig = () => {
   const token = localStorage.getItem("token");
 
@@ -14,12 +15,12 @@ const getConfig = () => {
 };
 
 export const getTasks = async () => {
-  const response = await axios.get(API_URL, getConfig());
+  const response = await axios.get(TASKS_URL, getConfig());
   return response.data;
 };
 export const createTask = async (title: string, description: string) => {
   const response = await axios.post(
-    API_URL,
+    TASKS_URL,
     {
       title,
       description,
@@ -29,7 +30,7 @@ export const createTask = async (title: string, description: string) => {
   return response.data;
 };
 export const deleteTask = async (id: number) => {
-  const response = await axios.delete(`${API_URL}/${id}`, getConfig());
+  const response = await axios.delete(`${TASKS_URL}/${id}`, getConfig());
   return response.data;
 };
 export const updateTask = async (
@@ -39,7 +40,7 @@ export const updateTask = async (
   status: TaskStatus,
 ) => {
   const response = await axios.put(
-    `${API_URL}/${id}`,
+    `${TASKS_URL}/${id}`,
     { title, description, status },
     getConfig(),
   );
