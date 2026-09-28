@@ -7,8 +7,14 @@ import authRouter from "./routes/authRoutes.js";
 import cors from "cors";
 
 const app = express();
-const port = process.env.PORT;
+const port = Number(process.env.PORT || 3000);
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET is not configured");
+}
+if (!Number.isInteger(port) || port <= 0) {
+  throw new Error("PORT must be a valid positive integer");
+}
 app.use(
   cors({
     origin: frontendUrl,
