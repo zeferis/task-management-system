@@ -44,6 +44,7 @@ const Login = ({ onLogin }: LoginProps) => {
         onChange={(e) => {
           setEmail(e.target.value);
         }}
+        required
       />
       <label htmlFor="password">Password:</label>
       <input
@@ -54,6 +55,7 @@ const Login = ({ onLogin }: LoginProps) => {
         onChange={(e) => {
           setPassword(e.target.value);
         }}
+        required
       />
       <button type="submit" disabled={loading}>{loading?"logining":"login"}</button>
       {err&&(<p>{err}</p>)}

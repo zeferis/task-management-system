@@ -39,18 +39,22 @@ const Register = () => {
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        required
       />
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        required
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
+        minLength={8}
       />
       {err && <p>{err}</p>}
       <button type="submit" disabled={loading}>{loading?"Registering":"Register"}</button>
