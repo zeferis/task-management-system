@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { login } from "../services/authServices";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 interface LoginProps {
   onLogin: (token: string) => void;
@@ -59,6 +59,7 @@ const Login = ({ onLogin }: LoginProps) => {
       />
       <button type="submit" disabled={loading}>{loading?"logining":"login"}</button>
       {err&&(<p>{err}</p>)}
+      <Link to="/register">Không có tài khoản ?</Link>
     </form>
   );
 };

@@ -8,10 +8,10 @@ import {
 import TaskItem from "../components/TaskItem";
 import axios from "axios";
 import type { Task } from "../types/task";
-interface logoutProps {
+interface LogoutProps {
   onLogout: () => void;
 }
-const Tasks = ({ onLogout }: logoutProps) => {
+const Tasks = ({ onLogout }: LogoutProps) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [titles, setTitles] = useState("");
   const [description, setDescription] = useState("");
@@ -20,6 +20,7 @@ const Tasks = ({ onLogout }: logoutProps) => {
   const [editDescription, setEditDescription] = useState("");
   const [filter, setFilter] = useState("all");
   const [err, setErr] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
   const handleError = useCallback(
     (error: unknown) => {
       if (axios.isAxiosError(error)) {
@@ -37,6 +38,7 @@ const Tasks = ({ onLogout }: logoutProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
+    setIsCreating(true);
     try {
       const newTask = await createTask(titles, description);
       setTasks((prev) => [newTask, ...prev]);
@@ -44,6 +46,8 @@ const Tasks = ({ onLogout }: logoutProps) => {
       setDescription("");
     } catch (error) {
       handleError(error);
+    } finally {
+      setIsCreating(false);
     }
   };
   const handleDelete = async (id: number) => {
@@ -55,14 +59,15 @@ const Tasks = ({ onLogout }: logoutProps) => {
       handleError(error);
     }
   };
-  const handleComplete = async (task: Task) => {
+  const handleToggleStatus = async (task: Task) => {
     setErr("");
+    const status = task.status === "active" ? "complete" : "active";
     try {
       const updatedTask = await updateTask(
         task.id,
         task.title,
         task.description,
-        "complete",
+        status,
       );
 
       setTasks((prev) =>
@@ -119,14 +124,18 @@ const Tasks = ({ onLogout }: logoutProps) => {
           value={titles}
           placeholder="Title"
           onChange={(e) => setTitles(e.target.value)}
+          required
         />
         <input
           type="text"
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          required
         />
-        <button type="submit">Add Task</button>
+        <button type="submit" disabled={isCreating}>
+          {isCreating ? "Adding" : "Add Task:"}
+        </button>
       </form>
       <h1>Task Management</h1>
       <button onClick={() => setFilter("active")}>ACTIVE</button>
@@ -152,7 +161,7 @@ const Tasks = ({ onLogout }: logoutProps) => {
             <TaskItem
               task={task}
               onDelete={handleDelete}
-              onComplete={handleComplete}
+              onToggleStatus={handleToggleStatus}
               onEdit={handleEdit}
             />
           )}

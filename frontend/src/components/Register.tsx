@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { register } from "../services/authServices";
-import { useNavigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Register = () => {
@@ -58,6 +58,7 @@ const Register = () => {
       />
       {err && <p>{err}</p>}
       <button type="submit" disabled={loading}>{loading?"Registering":"Register"}</button>
+      <Link to="/login">Có tài khoản?</Link>
     </form>
   );
 };

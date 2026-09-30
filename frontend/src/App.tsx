@@ -7,15 +7,29 @@ function App() {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token"),
   );
-  const handleLogout=useCallback(()=>{
-    localStorage.removeItem('token');
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("token");
     setToken(null);
-  },[]);
+  }, []);
   return (
     <Routes>
-      <Route path="/" element={token ? <Tasks onLogout={handleLogout}/> : <Navigate to="/login" />} />
-      <Route path="/login" element={<Login onLogin={setToken} />} />
-      <Route path="/register" element={<Register />} />
+      <Route
+        path="/"
+        element={
+          token ? <Tasks onLogout={handleLogout} /> : <Navigate to="/login" replace/>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          token ? <Navigate to="/" replace /> : <Login onLogin={setToken} />
+        }
+      />
+      <Route
+        path="/register"
+        element={token ? <Navigate to="/" replace /> : <Register />}
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
