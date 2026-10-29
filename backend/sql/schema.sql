@@ -11,7 +11,7 @@ CREATE TABLE
     tasks (
         id SERIAL PRIMARY KEY,
         title VARCHAR NOT NULL,
-        description TEXT,
+        description TEXT NOT NULL DEFAULT '',
         status VARCHAR NOT NULL DEFAULT 'active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         user_id INTEGER NOT NULL,

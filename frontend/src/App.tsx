@@ -16,7 +16,11 @@ function App() {
       <Route
         path="/"
         element={
-          token ? <Tasks onLogout={handleLogout} /> : <Navigate to="/login" replace/>
+          token ? (
+            <Tasks onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
         }
       />
       <Route
