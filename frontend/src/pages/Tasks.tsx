@@ -23,6 +23,7 @@ const Tasks = ({ onLogout }: LogoutProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [pendingTaskId, setPendingTaskId] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
   const handleError = useCallback(
     (error: unknown) => {
       if (axios.isAxiosError(error)) {
@@ -118,8 +119,11 @@ const Tasks = ({ onLogout }: LogoutProps) => {
     setEditDescription(task.description);
   };
   const filterTasks = tasks.filter((task) => {
-    if (filter === "all" || task.status === filter) return true;
-    return false;
+    const matchesStatus = filter === "all" || task.status === filter;
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(search.toLowerCase().trim());
+    return matchesStatus && matchesSearch;
   });
   useEffect(() => {
     const fetchTasks = async () => {
@@ -215,8 +219,20 @@ const Tasks = ({ onLogout }: LogoutProps) => {
           </p>
         )}
         {!isLoading && !err && filterTasks.length === 0 && (
-          <p className="list-message">Chưa có công việc trong danh sách này.</p>
+          <p className="list-message">
+            {search.trim()
+              ? "Không tìm thấy công việc phù hợp với từ khóa."
+              : "Chưa có công việc trong danh sách này."}
+          </p>
         )}
+        <label htmlFor="task-search">Tìm công việc</label>
+        <input
+          id="task-search"
+          type="search"
+          placeholder="Nhập tiêu đề cần tìm..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <div className="task-grid">
           {filterTasks.map((task) => (
             <div key={task.id}>

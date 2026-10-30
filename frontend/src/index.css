@@ -290,6 +290,15 @@ a {
   background: #f8faf5;
 }
 
+/* Khoảng cách cho ô tìm kiếm công việc */
+label[for="task-search"] {
+  margin-bottom: 8px;
+}
+
+#task-search {
+  margin-bottom: 24px;
+}
+
 /* Thẻ công việc */
 .task-grid {
   display: grid;
